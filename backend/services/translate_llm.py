@@ -153,6 +153,7 @@ class OllamaTranslator:
     def __init__(self, model: str, base_url: str) -> None:
         self.model = model
         self.base_url = base_url.rstrip("/")
+        self.timeout = float(os.getenv("OLLAMA_TIMEOUT", "180"))
 
     def translate(
         self,
@@ -173,6 +174,7 @@ class OllamaTranslator:
         )
         payload = {
             "model": self.model,
+            "format": "json",
             "messages": [
                 {
                     "role": "system",
@@ -192,10 +194,10 @@ class OllamaTranslator:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urlopen(request, timeout=60) as response:
+        with urlopen(request, timeout=self.timeout) as response:
             response_data = json.loads(response.read().decode("utf-8"))
         content = response_data.get("message", {}).get("content", "")
-        result = json.loads(content)
+        result = _safe_json_loads(content)
         _validate_contract(result)
         return result
 
@@ -360,6 +362,10 @@ def _cache_key(block: dict) -> str:
     return block.get("source_text", "").strip()
 
 
+def _has_placeholder(text: str) -> bool:
+    return "__TERM_" in text
+
+
 def _chunked(items: list[tuple[int, dict]], size: int) -> Iterable[list[tuple[int, dict]]]:
     for i in range(0, len(items), size):
         yield items[i : i + size]
@@ -431,6 +437,7 @@ def _build_context(strategy: str, all_blocks: list[dict], chunk_blocks: list[dic
 def translate_blocks(
     blocks: Iterable[dict],
     target_language: str,
+    use_tm: bool = True,
     provider: str | None = None,
     model: str | None = None,
     api_key: str | None = None,
@@ -438,29 +445,42 @@ def translate_blocks(
 ) -> dict:
     mode = os.getenv("TRANSLATE_LLM_MODE", "mock").lower()
     resolved_provider = (provider or "openai").lower()
+    fallback_on_error = os.getenv("LLM_FALLBACK_ON_ERROR", "0").lower() in {
+        "1",
+        "true",
+        "yes",
+    }
 
     if mode == "mock" and provider is None:
         translator = MockTranslator()
     elif resolved_provider in {"openai", "chatgpt"}:
         resolved_key = api_key or os.getenv("OPENAI_API_KEY", "")
         if not resolved_key:
-            raise EnvironmentError("OPENAI_API_KEY is required for OpenAI translation")
-        config = TranslationConfig(
-            model=model or os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-            api_key=resolved_key,
-            base_url=base_url or os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
-        )
-        translator = OpenAITranslator(config)
+            if fallback_on_error:
+                translator = MockTranslator()
+            else:
+                raise EnvironmentError("OPENAI_API_KEY is required for OpenAI translation")
+        else:
+            config = TranslationConfig(
+                model=model or os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+                api_key=resolved_key,
+                base_url=base_url or os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+            )
+            translator = OpenAITranslator(config)
     elif resolved_provider == "gemini":
         resolved_key = api_key or os.getenv("GEMINI_API_KEY", "")
         if not resolved_key:
-            raise EnvironmentError("GEMINI_API_KEY is required for Gemini translation")
-        translator = GeminiTranslator(
-            api_key=resolved_key,
-            base_url=base_url
-            or os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta"),
-            model=model or os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
-        )
+            if fallback_on_error:
+                translator = MockTranslator()
+            else:
+                raise EnvironmentError("GEMINI_API_KEY is required for Gemini translation")
+        else:
+            translator = GeminiTranslator(
+                api_key=resolved_key,
+                base_url=base_url
+                or os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta"),
+                model=model or os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
+            )
     elif resolved_provider == "ollama":
         resolved_model = model or os.getenv("OLLAMA_MODEL", "llama3.1")
         translator = OllamaTranslator(
@@ -478,10 +498,14 @@ def translate_blocks(
     preferred_terms: list[tuple[str, str]] = []
     if source_lang and source_lang != "auto":
         preferred_terms = get_glossary_terms(source_lang, target_language)
-        preferred_terms.extend(get_tm_terms(source_lang, target_language))
+        if use_tm:
+            preferred_terms.extend(get_tm_terms(source_lang, target_language))
     else:
         preferred_terms = get_glossary_terms_any(target_language)
-        preferred_terms.extend(get_tm_terms_any(target_language))
+        if use_tm:
+            preferred_terms.extend(get_tm_terms_any(target_language))
+
+    use_placeholders = resolved_provider != "ollama"
 
     for index, block in enumerate(blocks_list):
         key = _cache_key(block)
@@ -489,22 +513,33 @@ def translate_blocks(
             translated_texts[index] = ""
             continue
         if key in cache:
+            if not use_placeholders and _has_placeholder(cache[key]):
+                continue
             translated_texts[index] = cache[key]
             continue
         if source_lang and source_lang != "auto":
-            tm_hit = lookup_tm(
-                source_lang=source_lang,
-                target_lang=target_language,
-                text=key,
-            )
-            if tm_hit is not None and _tm_respects_terms(key, tm_hit, preferred_terms):
-                translated_texts[index] = tm_hit
-                cache[key] = tm_hit
-                continue
+            if use_tm:
+                tm_hit = lookup_tm(
+                    source_lang=source_lang,
+                    target_lang=target_language,
+                    text=key,
+                )
+                if (
+                    tm_hit is not None
+                    and _tm_respects_terms(key, tm_hit, preferred_terms)
+                    and not (not use_placeholders and _has_placeholder(tm_hit))
+                ):
+                    translated_texts[index] = tm_hit
+                    cache[key] = tm_hit
+                    continue
         pending.append((index, block))
 
     chunk_size = int(os.getenv("LLM_CHUNK_SIZE", "40"))
+    if resolved_provider == "ollama" and "LLM_CHUNK_SIZE" not in os.environ:
+        chunk_size = 4
     max_retries = int(os.getenv("LLM_MAX_RETRIES", "2"))
+    if resolved_provider == "ollama" and "LLM_MAX_RETRIES" not in os.environ:
+        max_retries = 1
     backoff = float(os.getenv("LLM_RETRY_BACKOFF", "0.8"))
     context_strategy = os.getenv("LLM_CONTEXT_STRATEGY", "none").lower()
     glossary_path = os.getenv("LLM_GLOSSARY_PATH", "")
@@ -516,9 +551,13 @@ def translate_blocks(
         placeholder_tokens: list[str] = []
         for _, block in chunk:
             prepared = dict(block)
-            prepared_text, mapping = _apply_placeholders(
-                prepared.get("source_text", ""), preferred_terms
-            )
+            if use_placeholders:
+                prepared_text, mapping = _apply_placeholders(
+                    prepared.get("source_text", ""), preferred_terms
+                )
+            else:
+                prepared_text = prepared.get("source_text", "")
+                mapping = {}
             prepared["source_text"] = prepared_text
             if mapping:
                 placeholder_tokens.extend(mapping.keys())
@@ -547,17 +586,47 @@ def translate_blocks(
                     if glossary:
                         translated_text = _apply_glossary(translated_text, glossary)
                     translated_texts[original[0]] = translated_text
-                    cache[_cache_key(original[1])] = translated_text
-                    save_tm(
-                        source_lang=os.getenv("SOURCE_LANGUAGE", "auto"),
-                        target_lang=target_language,
-                        text=_cache_key(original[1]),
-                        translated=translated_text,
-                    )
+                    if use_tm and not _has_placeholder(translated_text):
+                        cache[_cache_key(original[1])] = translated_text
+                        save_tm(
+                            source_lang=os.getenv("SOURCE_LANGUAGE", "auto"),
+                            target_lang=target_language,
+                            text=_cache_key(original[1]),
+                            translated=translated_text,
+                        )
                 break
             except Exception:
                 attempt += 1
                 if attempt > max_retries:
+                    if fallback_on_error and mode != "mock":
+                        result = MockTranslator().translate(
+                            chunk_blocks,
+                            target_language,
+                            context=context,
+                            preferred_terms=preferred_terms,
+                            placeholder_tokens=placeholder_tokens,
+                        )
+                        result = _coerce_contract(result, chunk_blocks, target_language)
+                        _validate_contract(result)
+                        for (original, mapping), translated in zip(
+                            zip(chunk, placeholder_maps), result["blocks"]
+                        ):
+                            if "client_id" not in translated and original[1].get("client_id"):
+                                translated["client_id"] = original[1].get("client_id")
+                            translated_text = translated.get("translated_text", "")
+                            translated_text = _restore_placeholders(translated_text, mapping)
+                            if glossary:
+                                translated_text = _apply_glossary(translated_text, glossary)
+                            translated_texts[original[0]] = translated_text
+                            if use_tm and not _has_placeholder(translated_text):
+                                cache[_cache_key(original[1])] = translated_text
+                                save_tm(
+                                    source_lang=os.getenv("SOURCE_LANGUAGE", "auto"),
+                                    target_lang=target_language,
+                                    text=_cache_key(original[1]),
+                                    translated=translated_text,
+                                )
+                        break
                     raise
                 time.sleep(backoff * attempt)
 

@@ -34,7 +34,7 @@ from backend.translation_service import translate_document
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["http://localhost:5193", "http://127.0.0.1:5193"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -270,13 +270,15 @@ async def pptx_apply(
         raise HTTPException(status_code=400, detail="Only .pptx files are supported")
     try:
         pptx_bytes = await file.read()
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="Invalid PPTX file") from exc
+
+    try:
         blocks_data = coerce_blocks(json.loads(blocks))
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=400, detail="Invalid blocks JSON") from exc
     except Exception as exc:
         raise HTTPException(status_code=400, detail="Invalid blocks data") from exc
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail="Invalid PPTX file") from exc
 
     if mode not in {"bilingual", "correction"}:
         raise HTTPException(status_code=400, detail="Unsupported mode")
@@ -317,6 +319,7 @@ async def pptx_translate(
     secondary_language: str | None = Form(None),
     target_language: str | None = Form(None),
     mode: str = Form("bilingual"),
+    use_tm: bool = Form(False),
     provider: str | None = Form(None),
     model: str | None = Form(None),
     api_key: str | None = Form(None),
@@ -359,6 +362,7 @@ async def pptx_translate(
             if mode == "correction"
             else blocks_data,
             target_language,
+            use_tm=use_tm,
             provider=provider,
             model=model,
             api_key=api_key,

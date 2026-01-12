@@ -87,6 +87,7 @@ function App() {
   const [manageOpen, setManageOpen] = useState(false);
   const [glossaryItems, setGlossaryItems] = useState([]);
   const [tmItems, setTmItems] = useState([]);
+  const [useTm, setUseTm] = useState(false);
   const glossaryFileRef = useRef(null);
   const tmFileRef = useRef(null);
   const [fillColor, setFillColor] = useState("#FFF16A");
@@ -137,7 +138,7 @@ function App() {
 
   const cjkRegex = /[\u4e00-\u9fff\u3400-\u4dbf]/;
   const viRegex =
-    /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i;
+    /[\u00C0-\u00C3\u00C8-\u00CA\u00CC-\u00CD\u00D2-\u00D5\u00D9-\u00DA\u00DD\u00E0-\u00E3\u00E8-\u00EA\u00EC-\u00ED\u00F2-\u00F5\u00F9-\u00FA\u00FD\u0102\u0103\u0110\u0111\u0128\u0129\u0168\u0169\u01A0\u01A1\u01AF\u01B0\u1EA0-\u1EF9]/i;
 
   const extractLanguageLines = (text, lang) => {
     const lines = (text || "").split("\n").map((line) => line.trim()).filter(Boolean);
@@ -148,7 +149,7 @@ function App() {
       return lines.filter((line) => cjkRegex.test(line));
     }
     if (lang === "vi") {
-      return lines.filter((line) => !cjkRegex.test(line));
+      return lines.filter((line) => viRegex.test(line));
     }
     return lines;
   };
@@ -236,6 +237,17 @@ function App() {
     }
     handleDetectLanguages(file);
   }, [file]);
+
+  useEffect(() => {
+    if (mode !== "bilingual" || targetLocked) {
+      return;
+    }
+    const desired =
+      secondaryLang && secondaryLang !== "auto" ? secondaryLang : "zh-TW";
+    if (desired && desired !== targetLang) {
+      setTargetLang(desired);
+    }
+  }, [mode, secondaryLang, targetLang, targetLocked]);
 
   useEffect(() => {
     if (mode !== "correction") {
@@ -351,13 +363,19 @@ function App() {
   const applyDetectedLanguages = (summary) => {
     const primary = summary?.primary || "";
     const secondary = summary?.secondary || "";
+    const fallbackSecondary = targetLang || "zh-TW";
+
     if (!sourceLocked && primary) {
       setSourceLang(primary);
     }
-    if (!secondaryLocked && secondary) {
-      setSecondaryLang(secondary);
+    if (!secondaryLocked) {
+      if (secondary) {
+        setSecondaryLang(secondary);
+      } else if (!secondaryLang) {
+        setSecondaryLang(fallbackSecondary);
+      }
     }
-    if (!targetLocked) {
+    if (!targetLocked && !targetLang) {
       if (mode === "correction" && secondary) {
         setTargetLang(secondary);
       } else if (primary) {
@@ -369,9 +387,6 @@ function App() {
           setTargetLang("zh-TW");
         }
       }
-    }
-    if (secondary && mode !== "correction") {
-      setMode("correction");
     }
   };
 
@@ -423,6 +438,7 @@ function App() {
       formData.append("secondary_language", secondaryLang || "auto");
       formData.append("target_language", targetLang);
       formData.append("mode", mode);
+      formData.append("use_tm", useTm ? "true" : "false");
       formData.append("provider", llmProvider);
       if (llmModel) {
         formData.append("model", llmModel);
@@ -584,6 +600,22 @@ function App() {
       body: JSON.stringify(entry)
     });
     await loadMemory();
+  };
+
+  const convertMemoryToGlossary = async (item) => {
+    if (!item?.source_text || !item?.target_text) {
+      return;
+    }
+    await upsertGlossary({
+      source_lang: item.source_lang,
+      target_lang: item.target_lang,
+      source_text: item.source_text,
+      target_text: item.target_text,
+      priority: 0
+    });
+    if (item.id) {
+      await deleteMemory({ id: item.id });
+    }
   };
 
   const handleSeedTm = async () => {
@@ -910,6 +942,14 @@ function App() {
                 </select>
               </div>
             </div>
+            <label className="toggle-check">
+              <input
+                type="checkbox"
+                checked={useTm}
+                onChange={(event) => setUseTm(event.target.checked)}
+              />
+              使用翻譯記憶（TM）
+            </label>
             <p className="field-hint">
               已選擇檔案會自動偵測來源與第二語言，可手動覆寫。
             </p>
@@ -1217,7 +1257,6 @@ function App() {
         setLineColor={setLineColor}
         lineDash={lineDash}
         setLineDash={setLineDash}
-        onSaveCorrection={handleSaveCorrection}
       />
       <ManageModal
         open={manageOpen}
@@ -1234,6 +1273,7 @@ function App() {
         onDeleteGlossary={deleteGlossary}
         onUpsertMemory={upsertMemory}
         onDeleteMemory={deleteMemory}
+        onConvertToGlossary={convertMemoryToGlossary}
       />
     </div>
   );
@@ -1456,7 +1496,8 @@ function ManageModal({
   onUpsertGlossary,
   onDeleteGlossary,
   onUpsertMemory,
-  onDeleteMemory
+  onDeleteMemory,
+  onConvertToGlossary
 }) {
   const [editingKey, setEditingKey] = useState(null);
   const [editingOriginal, setEditingOriginal] = useState(null);
@@ -1852,6 +1893,15 @@ function ManageModal({
                           <button className="action-btn" type="button" onClick={() => handleEdit(item)}>
                             編輯
                           </button>
+                          {!isGlossary ? (
+                            <button
+                              className="action-btn"
+                              type="button"
+                              onClick={() => onConvertToGlossary(item)}
+                            >
+                              轉為術語
+                            </button>
+                          ) : null}
                           <button
                             className="action-btn danger"
                             type="button"

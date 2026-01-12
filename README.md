@@ -36,7 +36,7 @@ Tests:
 UI 介面 (React):
 - 後端啟動: `uvicorn backend.main:app --reload`
 - 前端啟動: `cd frontend && npm install && npm run dev`
-- 開啟: `http://localhost:5173`
+- 開啟: `http://localhost:5193`
 
 API (PPTX):
 - 抽取: `POST /api/pptx/extract` (multipart: file)

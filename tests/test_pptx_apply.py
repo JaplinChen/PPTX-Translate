@@ -21,7 +21,7 @@ class TestPptxApply(unittest.TestCase):
 
             blocks = [
                 {
-                    "slide_index": 1,
+                    "slide_index": 0,
                     "shape_id": shape_id,
                     "block_type": "textbox",
                     "translated_text": "Bonjour\nMonde",

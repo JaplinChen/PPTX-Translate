@@ -214,11 +214,11 @@ def apply_translations(
         else:
             combined_text = translated_text
         block_type = block.get("block_type", "textbox")
-        if not slide_index or not shape_id:
+        if slide_index is None or shape_id is None:
             continue
-        if slide_index - 1 >= len(presentation.slides):
+        if slide_index < 0 or slide_index >= len(presentation.slides):
             continue
-        slide = presentation.slides[slide_index - 1]
+        slide = presentation.slides[slide_index]
 
         if block_type == "notes":
             if not slide.has_notes_slide:

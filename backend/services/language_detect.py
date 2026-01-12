@@ -18,14 +18,22 @@ LANG_MAP = {
 
 _CJK_RE = re.compile(r"[\u4e00-\u9fff\u3400-\u4dbf]")
 _VI_DIACRITIC_RE = re.compile(
-    r"[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡ"
-    r"ùúụủũưừứựửữỳýỵỷỹđ]"
+    r"["
+    r"\u00C0-\u00C3\u00C8-\u00CA\u00CC-\u00CD\u00D2-\u00D5\u00D9-\u00DA\u00DD"
+    r"\u00E0-\u00E3\u00E8-\u00EA\u00EC-\u00ED\u00F2-\u00F5\u00F9-\u00FA\u00FD"
+    r"\u0102\u0103\u0110\u0111\u0128\u0129\u0168\u0169\u01A0\u01A1\u01AF\u01B0"
+    r"\u1EA0-\u1EF9"
+    r"]"
 )
 _ZH_TRAD_CHARS = set(
-    "體萬與專業經辦應該麼臺灣廣門齊裡發後國點線車書龍這為"
+    "\u9ad4\u842c\u8207\u5c08\u696d\u7d93\u8fa6\u61c9\u8a72\u9ebc\u81fa\u7063"
+    "\u5ee3\u9580\u9f4a\u88e1\u767c\u5f8c\u570b\u9ede\u7dda\u8eca\u66f8\u9f8d"
+    "\u9019\u70ba"
 )
 _ZH_SIMP_CHARS = set(
-    "体万与专业经办应该么台湾广门齐里发后国点线车书龙这为"
+    "\u4f53\u4e07\u4e0e\u4e13\u4e1a\u7ecf\u529e\u5e94\u8be5\u4e48\u53f0\u6e7e"
+    "\u5e7f\u95e8\u9f50\u91cc\u53d1\u540e\u56fd\u70b9\u7ebf\u8f66\u4e66\u9f99"
+    "\u8fd9\u4e3a"
 )
 
 
