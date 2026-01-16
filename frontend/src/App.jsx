@@ -395,17 +395,21 @@ function App() {
       return;
     }
     const fileName = file.name.toLowerCase();
-    if (!fileName.endsWith(".pptx")) {
-      setStatus("只支援 .pptx 檔案，請重新選擇");
+    const isPdf = fileName.endsWith(".pdf");
+    const isPptx = fileName.endsWith(".pptx");
+
+    if (!isPdf && !isPptx) {
+      setStatus("只支援 .pptx 或 .pdf 檔案，請重新選擇");
       return;
     }
+    const endpoint = isPdf ? "/api/pdf/extract" : "/api/pptx/extract";
     setBusy(true);
     let mockWarning = "";
     setStatus("抽取中...");
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await fetch(`${API_BASE}/api/pptx/extract`, {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
         body: formData
       });
@@ -848,8 +852,12 @@ function App() {
     let mockWarning = "";
     setStatus("套用中...");
     try {
+      const isPdf = file.name.toLowerCase().endsWith(".pdf");
+      const endpoint = isPdf ? "/api/pdf/apply" : "/api/pptx/apply";
+
       const formData = new FormData();
       formData.append("file", file);
+
       const applyBlocks =
         mode === "correction"
           ? blocks.map((block) =>
@@ -863,18 +871,27 @@ function App() {
               translated_text: block.translated_text || block.source_text || ""
             }))
             : blocks;
+
       formData.append("blocks", JSON.stringify(applyBlocks));
-      formData.append("mode", mode);
-      if (mode === "correction") {
-        formData.append("fill_color", fillColor);
-        formData.append("text_color", textColor);
-        formData.append("line_color", lineColor);
-        formData.append("line_dash", lineDash);
+      formData.append("target_language", targetLang);
+
+      if (isPdf) {
+        // PDF 模式專用
+      } else {
+        // PPTX 模式專用
+        formData.append("mode", mode);
+        if (mode === "correction") {
+          formData.append("fill_color", fillColor);
+          formData.append("text_color", textColor);
+          formData.append("line_color", lineColor);
+          formData.append("line_dash", lineDash);
+        }
+        if (mode === "bilingual") {
+          formData.append("bilingual_layout", bilingualLayout);
+        }
       }
-      if (mode === "bilingual") {
-        formData.append("bilingual_layout", bilingualLayout);
-      }
-      const response = await fetch(`${API_BASE}/api/pptx/apply`, {
+
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
         body: formData
       });
