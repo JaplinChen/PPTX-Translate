@@ -1,88 +1,148 @@
-﻿# 內部文件翻譯工具
+﻿# 企業級 PPTX 翻譯與校正控制台
 
-## 目的
-- 內部使用的文件翻譯工具（先支援 DOCX 與 PPTX）
-- 自動語言偵測
-- 輸出模式：直接翻譯、雙語
-- 校正樣式：色彩標示（Correction）
+> 內部文件翻譯工具，支援 PPTX 與 DOCX 格式
 
-## 不在範圍內（v1）
-- 公開對外、計費、多租戶
-- 圖片文字辨識（OCR）
-- 動畫與轉場
+## 功能特色
+
+- 🌐 **多語言支援**：自動偵測語言，支援中文（繁體/簡體）、越南語、英語、日語、韓語
+- 🤖 **多 LLM 提供者**：Ollama（本機）、Gemini、OpenAI
+- 📝 **翻譯記憶庫**：SQLite 儲存，支援術語表與翻譯記憶
+- 🎨 **校正模式**：色彩標示校正內容
+- 📄 **雙語輸出**：同時保留原文與譯文
+- 🐳 **Docker 部署**：一鍵啟動前後端服務
+
+---
 
 ## 快速開始
-### 後端
+
+### 方式一：Docker 部署（推薦）
+
 ```bash
-pip install -r requirements.txt
-uvicorn backend.main:app --reload
+# 1. 啟動 Ollama（如需本機 LLM）
+OLLAMA_HOST=0.0.0.0 ollama serve
+
+# 2. 一鍵啟動
+./start_docker.sh
+
+# 或手動啟動
+docker compose up -d --build
 ```
 
-### 前端
+**存取位置**：
+
+- 前端：<http://localhost:5193>
+- 後端 API：<http://localhost:5001>
+- API 文件：<http://localhost:5001/docs>
+
+---
+
+### 方式二：本機開發
+
+**後端**
+
+```bash
+pip install -r requirements.txt
+uvicorn backend.main:app --reload --port 5001
+```
+
+**前端**
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## PPTX 範例指令
-- 文字抽取：
+---
+
+## 環境變數設定
+
+複製 `.env.example` 並填入設定：
+
 ```bash
-python -m backend.tools.extract_pptx tests/fixtures/sample.pptx > /tmp/blocks.json
+# Server
+PORT=5001
+
+# LLM Providers
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=qwen2.5:7b
+GEMINI_API_KEY=your_api_key
+OPENAI_API_KEY=your_api_key
+
+# Translation
+TRANSLATE_LLM_MODE=real    # real | mock
+LLM_CHUNK_SIZE=40
+LLM_MAX_RETRIES=2
 ```
 
-- 模擬翻譯（雙語）並套用：
-```bash
-python -m backend.tools.mock_translate_blocks --in /tmp/blocks.json --out /tmp/blocks_translated.json
-python -m backend.tools.apply_bilingual --in tests/fixtures/sample.pptx --out /tmp/sample_bilingual.pptx --blocks /tmp/blocks_translated.json
+---
+
+## API 端點
+
+| 端點 | 方法 | 說明 |
+|------|------|------|
+| `/api/pptx/extract` | POST | 抽取 PPTX 文字區塊 |
+| `/api/pptx/languages` | POST | 偵測文件語言 |
+| `/api/pptx/translate` | POST | 翻譯文字區塊 |
+| `/api/pptx/apply` | POST | 套用翻譯並生成新檔案 |
+| `/api/llm/models` | POST | 取得 LLM 模型清單 |
+| `/api/tm/glossary` | GET/POST | 術語表管理 |
+| `/api/tm/entries` | GET/POST | 翻譯記憶管理 |
+| `/health` | GET | 健康檢查（Docker 用） |
+
+---
+
+## 專案結構
+
+```
+PPT_Translate/
+├── backend/
+│   ├── api/           # FastAPI 路由
+│   ├── services/      # 業務邏輯
+│   └── prompts/       # LLM 提示詞模板
+├── frontend/
+│   └── src/           # React 前端
+├── docs/              # 合約檔案
+├── data/              # 運行時資料
+├── Dockerfile.backend
+├── Dockerfile.frontend
+├── docker-compose.yml
+├── nginx.conf
+└── TECH_SPEC.md       # 完整技術規格
 ```
 
-- 模擬翻譯（校正）並套用：
-```bash
-python -m backend.tools.mock_translate_blocks --in /tmp/blocks.json --out /tmp/blocks_corrected.json
-python -m backend.tools.apply_corrections --in tests/fixtures/sample.pptx --out /tmp/sample_corrected.pptx --blocks /tmp/blocks_corrected.json
+---
+
+## 翻譯記憶庫
+
+- **資料庫**：`data/translation_memory.db`（SQLite）
+- **術語表**：優先套用，確保一致性
+- **翻譯記憶**：自動快取已翻譯內容
+
+**CSV 匯入格式**：
+
+```csv
+source_lang,target_lang,source_text,target_text,priority
 ```
 
-## API（PPTX）
-- 抽取：`POST /api/pptx/extract`（multipart：file）
-- 套用：`POST /api/pptx/apply`（multipart：file, blocks, mode, fill_color, text_color, line_color, line_dash）
-- 翻譯：`POST /api/pptx/translate`（multipart：blocks, source_language, target_language, mode）
-- 模型清單：`POST /api/llm/models`（multipart：provider, api_key, base_url）
-
-## 語言偵測
-- 回傳 `language_summary`（primary/secondary/counts）
-- 前端可依此填入來源語言與第二語言
-
-## LLM 設定
-- `TRANSLATE_LLM_MODE=real|mock`
-  - 預設為 `real`，需要對應供應商的 API Key 或本機服務
-  - `mock` 模式會強制使用 MockTranslator，忽略前端傳入的 provider 與連線設定
-- `OPENAI_API_KEY`、`OPENAI_MODEL`、`OPENAI_BASE_URL`
-- `GEMINI_API_KEY`、`GEMINI_MODEL`、`GEMINI_BASE_URL`
-- `LLM_CHUNK_SIZE`、`LLM_MAX_RETRIES`、`LLM_RETRY_BACKOFF`
-- `LLM_CONTEXT_STRATEGY=none|neighbor|title-only|deck`
-- `LLM_GLOSSARY_PATH=/path/to/glossary.csv`
-- Ollama GPU 設定（需由本機 Ollama 支援 GPU）：
-  - `OLLAMA_FORCE_GPU=1`（未指定 GPU 參數時，預設使用 `num_gpu=1`）
-  - `OLLAMA_NUM_GPU`、`OLLAMA_NUM_GPU_LAYERS`
-  - `OLLAMA_NUM_CTX`、`OLLAMA_NUM_THREAD`
-
-## 翻譯記憶庫（SQLite）
-- 資料庫位置：`data/translation_memory.db`
-- glossary：術語表，優先套用
-- tm：翻譯記憶，命中後直接套用
-
-## CSV 匯入格式
-- glossary：`source_lang,target_lang,source_text,target_text,priority`
-- tm：`source_lang,target_lang,source_text,target_text`
+---
 
 ## 限制說明
+
 - 複雜排版與混合字型可能被簡化
 - 雙語模式可能讓版面略為重新流動
-- 校正樣式以整個圖形為單位，無法精準到每個字元
-- 部分形狀不支援逐段落上色
+- 校正樣式以整個圖形為單位
+- 不支援圖片文字辨識（OCR）
+- 不支援動畫與轉場
 
-## 驗證指令
-- build：`build`
-- lint：`lint`
-- test：`test`
+---
+
+## 技術文件
+
+詳細技術規格請參閱 [TECH_SPEC.md](TECH_SPEC.md)
+
+---
+
+## 授權
+
+內部使用
