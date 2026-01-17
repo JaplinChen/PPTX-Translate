@@ -1,0 +1,232 @@
+/* === Layout & Panel Styles === */
+@layer components {
+
+    /* App Container & Hero */
+    .app {
+        @apply min-h-screen p-8 max-w-7xl mx-auto;
+    }
+
+    .hero {
+        @apply flex justify-between items-start mb-8 pb-6 border-b border-slate-100;
+    }
+
+    .hero h1 {
+        @apply text-3xl font-extrabold text-slate-900 tracking-tight leading-tight mb-3 mt-1;
+    }
+
+    .hero .subtitle {
+        @apply text-slate-500 text-lg max-w-2xl;
+    }
+
+    .kicker {
+        @apply uppercase tracking-widest text-sm font-bold text-blue-600 mb-2;
+    }
+
+    /* Status Card */
+    .status {
+        @apply bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl px-6 py-3 shadow-sm min-w-[120px];
+    }
+
+    .status-label {
+        @apply block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5;
+    }
+
+    .status-value {
+        @apply text-sm font-bold text-blue-600;
+    }
+
+    /* Header Actions Grouping */
+    .header-actions-group {
+        @apply flex flex-col items-end gap-3;
+    }
+
+    .header-actions-group .btn-group {
+        @apply flex gap-2;
+    }
+
+    /* Grid Layout */
+    .main-grid {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: 350px 1fr;
+    }
+
+    /* Panels */
+    .panel {
+        @apply bg-white rounded-2xl p-8 shadow-md border border-slate-100 flex flex-col gap-6 relative overflow-hidden;
+    }
+
+    .panel::after {
+        content: "";
+        @apply absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-transparent opacity-60;
+    }
+
+    .panel-header {
+        @apply border-b border-slate-200 pb-4 -mb-2;
+    }
+
+    .panel-header h2 {
+        @apply m-0 text-lg font-semibold text-slate-800;
+    }
+
+    .panel-header-row {
+        @apply flex justify-between items-start gap-3;
+    }
+
+    /* Pills */
+    .pill {
+        @apply inline-block px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-xs font-medium;
+    }
+
+    .status-pill {
+        @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium;
+    }
+
+    .status-pill.is-running {
+        @apply bg-amber-50 text-amber-600;
+    }
+
+    /* Flow Panel */
+    .flow-panel {
+        @apply bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col gap-4;
+    }
+
+    .flow-item {
+        @apply flex gap-3 items-start text-sm text-slate-500;
+    }
+
+    .flow-dot {
+        @apply w-5 h-5 rounded-full border-2 border-slate-300 bg-white flex-shrink-0 flex items-center justify-center text-xs font-bold text-slate-400;
+    }
+
+    .flow-dot.is-active {
+        @apply border-blue-600 bg-blue-600 text-white;
+    }
+
+    /* Block List */
+    .block-list {
+        @apply flex flex-col gap-5 overflow-y-auto pr-2;
+    }
+
+    .block-card {
+        @apply bg-white border border-slate-200 rounded-2xl p-6 flex flex-col gap-4 transition-all duration-200 hover:shadow-md hover:border-slate-300;
+    }
+
+    .block-meta {
+        @apply flex gap-3 items-center flex-wrap text-sm text-slate-500;
+    }
+
+    .block-body {
+        @apply grid grid-cols-2 gap-5;
+    }
+
+    /* Empty State */
+    .empty-state {
+        @apply text-center py-10 text-slate-400;
+    }
+
+    .empty-state p {
+        @apply text-base font-medium mb-2;
+    }
+
+    .empty-state span {
+        @apply text-sm;
+    }
+
+    /* Filter Row */
+    .filter-row {
+        @apply flex gap-4 items-end flex-wrap pb-4 border-b border-slate-200;
+    }
+
+    .filter-item {
+        @apply flex flex-col gap-1 min-w-24;
+    }
+
+    .filter-actions {
+        @apply flex gap-2 items-end;
+    }
+
+    /* Data Table */
+    .data-table {
+        @apply border border-slate-200 rounded-xl overflow-hidden;
+    }
+
+    .data-table.is-glossary .data-row {
+        grid-template-columns: 100px 100px minmax(120px, 1.5fr) minmax(120px, 1.5fr) 80px 120px;
+    }
+
+    .data-table.is-tm .data-row {
+        grid-template-columns: 100px 100px minmax(120px, 1fr) minmax(120px, 1fr) 120px;
+    }
+
+    .data-header {
+        @apply bg-slate-50 border-b border-slate-200 font-bold text-xs uppercase tracking-wider text-slate-500;
+    }
+
+    .data-header .data-cell {
+        @apply py-4 whitespace-nowrap;
+    }
+
+    .data-row {
+        @apply grid border-b border-slate-200 last:border-b-0 transition-colors duration-150;
+    }
+
+    .data-row:hover {
+        @apply bg-slate-50/50;
+    }
+
+    .data-cell {
+        @apply px-4 py-4 flex items-center text-sm text-slate-700 overflow-hidden min-h-[56px];
+        word-break: break-word;
+    }
+
+    .data-cell.data-actions {
+        @apply flex gap-1 items-center justify-end px-2;
+    }
+
+    .action-btn-sm {
+        @apply w-8 h-8 rounded-lg flex items-center justify-center text-lg transition-all duration-200 hover:bg-slate-100;
+    }
+
+    .action-btn-sm.primary {
+        @apply text-blue-600 hover:bg-blue-50;
+    }
+
+    .action-btn-sm.danger {
+        @apply text-rose-500 hover:bg-rose-50;
+    }
+
+    .action-btn-sm.success {
+        @apply text-emerald-600 hover:bg-emerald-50;
+    }
+
+    .action-btn-sm.ghost {
+        @apply text-slate-400 hover:bg-slate-100 hover:text-slate-600;
+    }
+
+    .data-input {
+        @apply w-full h-8 px-2 rounded border border-slate-200 text-sm focus:outline-none focus:border-blue-500;
+    }
+
+    .data-empty {
+        @apply text-center py-8 text-slate-400 text-sm;
+    }
+
+    /* Action Row */
+    .action-row {
+        @apply flex gap-2 flex-wrap items-center pb-4 border-b border-slate-200;
+    }
+
+    /* Create Row */
+    .create-row {
+        @apply flex gap-4 items-end py-4 border-b border-slate-200;
+    }
+
+    .create-fields {
+        @apply flex gap-2 flex-1 flex-wrap;
+    }
+
+    .create-fields .select-input {
+        @apply min-w-[100px] flex-1;
+    }
+}

@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === CSS Variables === */
+:root {
+    --accent: #2563eb;
+    --accent-strong: #1e3a8a;
+    --accent-soft: #eff6ff;
+    --correction-fill: #fef9c3;
+    --correction-text: #b91c1c;
+    --correction-line: #9333ea;
+}
+
+
+/* === Base Layer === */
+@layer base {
+    body {
+        @apply font-sans antialiased;
+        font-family: "IBM Plex Sans", "Noto Sans TC", sans-serif;
+    }
+}

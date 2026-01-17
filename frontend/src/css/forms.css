@@ -1,0 +1,113 @@
+/* === Form & Input Styles === */
+@layer components {
+    .form-group {
+        @apply flex flex-col gap-2;
+    }
+
+    .field-label {
+        @apply text-sm font-semibold text-slate-700;
+    }
+
+    .field-hint {
+        @apply text-xs text-slate-400;
+    }
+
+    .field-label-row {
+        @apply flex justify-between items-center;
+    }
+
+    .select-input,
+    .text-input {
+        @apply w-full h-11 px-4 border border-slate-200 rounded-xl text-sm bg-white text-slate-800;
+        @apply transition-all duration-200 hover:border-slate-300;
+        @apply focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100;
+    }
+
+    .file-input {
+        @apply w-full h-11 px-4 border border-dashed border-slate-300 rounded-xl text-sm bg-slate-50 text-slate-500;
+        @apply flex items-center justify-center cursor-pointer hover:bg-white hover:border-blue-500 hover:text-blue-600;
+    }
+
+    .data-input {
+        @apply h-11 px-3 border border-slate-200 rounded-lg text-sm bg-white text-slate-700;
+        @apply focus:outline-none focus:border-blue-500;
+    }
+
+    .color-input {
+        @apply w-full h-10 rounded-lg border border-slate-200 cursor-pointer;
+        @apply focus:outline-none focus:ring-2 focus:ring-blue-100;
+    }
+
+    .toggle-check {
+        @apply flex items-center gap-2 text-sm text-slate-500 cursor-pointer;
+    }
+
+    .toggle-check input[type="checkbox"] {
+        @apply w-4 h-4 accent-blue-600;
+    }
+
+    .toggle-row {
+        @apply flex items-center gap-2 text-sm text-slate-600 cursor-pointer;
+    }
+
+    .toggle-row input[type="checkbox"] {
+        @apply w-4 h-4 accent-blue-600;
+    }
+
+    .select-box {
+        @apply flex items-center gap-2;
+    }
+
+    .readonly-box {
+        @apply min-h-28 p-3 rounded-xl bg-slate-50 border border-transparent text-slate-700 leading-relaxed text-base;
+    }
+
+    .textarea {
+        @apply w-full min-h-28 p-3 rounded-xl border border-slate-200 bg-white text-slate-700 leading-relaxed text-base resize-y;
+        @apply focus:outline-none focus:border-blue-500;
+    }
+
+    .correction-editor {
+        @apply min-h-28 p-3 rounded-xl leading-relaxed text-base font-medium;
+        background: var(--correction-fill);
+        color: var(--correction-text);
+        border: 2px dashed var(--correction-line);
+    }
+
+    .correction-editor:focus {
+        @apply outline-none;
+        box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.15);
+    }
+
+    .hidden-input {
+        @apply hidden;
+    }
+
+    .hint {
+        @apply text-xs text-slate-400 mt-1;
+    }
+
+    .row-group {
+        @apply grid grid-cols-2 gap-3 items-end;
+    }
+
+    .row-group-3 {
+        @apply grid grid-cols-3 gap-3 items-end;
+    }
+
+    .action-row {
+        @apply flex gap-3 flex-wrap;
+    }
+
+    .inline-row {
+        @apply flex gap-2 items-center;
+    }
+
+    .inline-row.between {
+        @apply justify-between;
+    }
+
+    .inline-row input {
+        @apply flex-1;
+    }
+}

@@ -34,7 +34,7 @@ async def llm_models(
                 api_key, base_url or "https://generativelanguage.googleapis.com/v1beta"
             )
         elif provider == "ollama":
-            models = list_ollama_models(base_url or "http://localhost:11434")
+            models = list_ollama_models(base_url or "http://host.docker.internal:11434")
         else:
             raise HTTPException(status_code=400, detail="不支援的 provider")
     except HTTPException:
@@ -44,7 +44,7 @@ async def llm_models(
             raise HTTPException(
                 status_code=400,
                 detail=build_connection_refused_message(
-                    "Ollama", base_url or "http://localhost:11434"
+                    "Ollama", base_url or "http://host.docker.internal:11434"
                 ),
             ) from exc
         raise HTTPException(status_code=400, detail=str(exc)) from exc

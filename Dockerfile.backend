@@ -3,7 +3,7 @@ FROM python:3.13-slim AS base
 
 WORKDIR /app
 
-# Install only required system packages
+# Install only required system packages (including Tesseract OCR)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/* \
