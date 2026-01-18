@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { API_BASE } from "../constants";
+import { CustomSelect } from "./common/CustomSelect";
 
 // Inline ExportButton component for multi-format exports
 function ExportButton({ format, label, blocks, disabled }) {
@@ -128,7 +129,12 @@ export function Sidebar({
                 {/* Step 1: 上傳檔案 */}
                 <div className={`accordion-section ${openSections.step1 ? "is-open" : ""} ${isFileSelected ? "is-done" : ""}`}>
                     <div className="accordion-header" onClick={() => toggleSection("step1")}>
-                        <span>{isFileSelected ? "✓" : "1."} 上傳檔案</span>
+                        <div className="flex items-center gap-2">
+                            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${isFileSelected ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>
+                                {isFileSelected ? "✓" : "1"}
+                            </span>
+                            <span className="step-label">上傳檔案</span>
+                        </div>
                         <span className="accordion-indicator">▼</span>
                     </div>
                     <div className="accordion-content" style={{ maxHeight: openSections.step1 ? "500px" : "0", opacity: openSections.step1 ? 1 : 0 }}>
@@ -158,7 +164,12 @@ export function Sidebar({
                 {/* Step 2: 設定 */}
                 <div className={`accordion-section ${openSections.step2 ? "is-open" : ""} ${isExtracted ? "is-done" : ""}`}>
                     <div className="accordion-header" onClick={() => toggleSection("step2")}>
-                        <span>{isExtracted ? "✓" : "2."} 設定</span>
+                        <div className="flex items-center gap-2">
+                            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${isExtracted ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>
+                                {isExtracted ? "✓" : "2"}
+                            </span>
+                            <span className="step-label">偏好設定</span>
+                        </div>
                         <span className="accordion-indicator">▼</span>
                     </div>
                     <div className="accordion-content" style={{ maxHeight: openSections.step2 ? "800px" : "0", opacity: openSections.step2 ? 1 : 0 }}>
@@ -166,20 +177,28 @@ export function Sidebar({
                             <div className="row-group">
                                 <div className="form-group">
                                     <label className="field-label">模式</label>
-                                    <select className="select-input" value={mode} onChange={(e) => setMode(e.target.value)}>
-                                        <option value="bilingual">雙語輸出</option>
-                                        <option value="translated">翻譯文件</option>
-                                        <option value="correction">校正模式</option>
-                                    </select>
+                                    <CustomSelect
+                                        options={[
+                                            { value: "bilingual", label: "雙語輸出" },
+                                            { value: "translated", label: "翻譯文件" },
+                                            { value: "correction", label: "校正模式" }
+                                        ]}
+                                        value={mode}
+                                        onChange={(e) => setMode(e.target.value)}
+                                    />
                                 </div>
                                 {mode === "bilingual" && (
                                     <div className="form-group">
                                         <label className="field-label">版面</label>
-                                        <select className="select-input" value={bilingualLayout} onChange={(e) => setBilingualLayout(e.target.value)}>
-                                            <option value="inline">同框</option>
-                                            <option value="auto">自動</option>
-                                            <option value="new_slide">新頁</option>
-                                        </select>
+                                        <CustomSelect
+                                            options={[
+                                                { value: "inline", label: "同框" },
+                                                { value: "auto", label: "自動" },
+                                                { value: "new_slide", label: "新頁" }
+                                            ]}
+                                            value={bilingualLayout}
+                                            onChange={(e) => setBilingualLayout(e.target.value)}
+                                        />
                                     </div>
                                 )}
                             </div>
@@ -187,13 +206,17 @@ export function Sidebar({
                             <div className="form-group">
                                 <label className="field-label">語言設定</label>
                                 <div className="row-group-3">
-                                    <select className="select-input" value={sourceLang || "auto"} onChange={(e) => { setSourceLang(e.target.value); setSourceLocked(true); }}>
-                                        {(languageOptions || []).map(opt => <option key={opt.code} value={opt.code}>{opt.label}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        options={languageOptions || []}
+                                        value={sourceLang || "auto"}
+                                        onChange={(e) => { setSourceLang(e.target.value); setSourceLocked(true); }}
+                                    />
                                     <div className="text-center font-bold text-slate-300">→</div>
-                                    <select className="select-input" value={targetLang} onChange={(e) => { setTargetLang(e.target.value); setTargetLocked(true); }}>
-                                        {(languageOptions || []).filter(opt => opt.code !== "auto").map(opt => <option key={opt.code} value={opt.code}>{opt.label}</option>)}
-                                    </select>
+                                    <CustomSelect
+                                        options={(languageOptions || []).filter(opt => opt.code !== "auto")}
+                                        value={targetLang}
+                                        onChange={(e) => { setTargetLang(e.target.value); setTargetLocked(true); }}
+                                    />
                                 </div>
                             </div>
 
@@ -212,7 +235,12 @@ export function Sidebar({
                 {/* Step 3: 翻譯 */}
                 <div className={`accordion-section ${openSections.step3 ? "is-open" : ""} ${hasTranslation ? "is-done" : ""}`}>
                     <div className="accordion-header" onClick={() => toggleSection("step3")}>
-                        <span>{hasTranslation ? "✓" : "3."} 翻譯</span>
+                        <div className="flex items-center gap-2">
+                            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${hasTranslation ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>
+                                {hasTranslation ? "✓" : "3"}
+                            </span>
+                            <span className="step-label">翻譯執行</span>
+                        </div>
                         <span className="accordion-indicator">▼</span>
                     </div>
                     <div className="accordion-content" style={{ maxHeight: openSections.step3 ? "400px" : "0", opacity: openSections.step3 ? 1 : 0 }}>
@@ -250,7 +278,12 @@ export function Sidebar({
                 {/* Step 4: 下載 */}
                 <div className={`accordion-section ${openSections.step4 ? "is-open" : ""} ${isFinished ? "is-done" : ""}`}>
                     <div className="accordion-header" onClick={() => toggleSection("step4")}>
-                        <span>{isFinished ? "✓" : "4."} 下載</span>
+                        <div className="flex items-center gap-2">
+                            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${isFinished ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>
+                                {isFinished ? "✓" : "4"}
+                            </span>
+                            <span className="step-label">完成下載</span>
+                        </div>
                         <span className="accordion-indicator">▼</span>
                     </div>
                     <div className="accordion-content" style={{ maxHeight: openSections.step4 ? "400px" : "0", opacity: openSections.step4 ? 1 : 0 }}>

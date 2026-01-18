@@ -139,6 +139,7 @@ function App() {
           currentStep={currentStep}
           steps={steps}
           status={ui.status}
+          progress={processor.progress}
           onOpenSettings={() => llm.setLlmOpen(true)}
           onOpenManage={() => tm.setManageOpen(true)}
         />

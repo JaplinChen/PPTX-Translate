@@ -23,9 +23,21 @@ export function usePptxProcessor({
     setStatus,
     setBusy
 }) {
+    const [progress, setProgress] = useState(0);
+
     const readErrorDetail = async (response, fallback) => {
         const errorText = await response.text();
         if (!errorText) return fallback;
+
+        // 如果是 HTML (通常是 502/504 Bad Gateway)
+        if (errorText.includes("<html>")) {
+            const titleMatch = errorText.match(/<title>(.*?)<\/title>/);
+            if (titleMatch && titleMatch[1]) return `伺服器連線異常: ${titleMatch[1]}`;
+            if (response.status === 502) return "伺服器連線中斷 (502 Bad Gateway)";
+            if (response.status === 504) return "伺服器響應超時 (504 Gateway Timeout)";
+            return `連線異常 (${response.status})`;
+        }
+
         try {
             const errorData = JSON.parse(errorText);
             return errorData.detail || errorText;
@@ -102,6 +114,7 @@ export function usePptxProcessor({
         setBusy(true);
         const totalCount = blocks.length;
         const chunkSize = llmProvider === "ollama" ? (llmFastMode ? 3 : 6) : 20;
+        setProgress(0);
         setStatus(`翻譯中...（0/${totalCount}）`);
         try {
             let translatedCount = 0;
@@ -150,9 +163,11 @@ export function usePptxProcessor({
                 });
 
                 translatedCount += chunkBlocks.length;
+                setProgress(Math.round((translatedCount / totalCount) * 100));
                 setBlocks([...updatedBlocks]);
                 setStatus(`翻譯中...（${translatedCount}/${totalCount}）`);
             }
+            setProgress(100);
             setStatus("翻譯完成");
         } catch (error) {
             setStatus(`翻譯失敗：${error.message}`);
@@ -206,5 +221,5 @@ export function usePptxProcessor({
         }
     };
 
-    return { handleExtract, handleTranslate, handleApply };
+    return { handleExtract, handleTranslate, handleApply, progress };
 }

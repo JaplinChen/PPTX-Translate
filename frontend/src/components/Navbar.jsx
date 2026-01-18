@@ -1,9 +1,14 @@
 import React from "react";
 import TokenStats from "./TokenStats";
 
-export function Navbar({ currentStep, status, onOpenSettings, onOpenManage, steps }) {
+export function Navbar({ currentStep, status, onOpenSettings, onOpenManage, steps, progress }) {
     return (
         <nav className="navbar">
+            {progress > 0 && progress < 100 && (
+                <div className="navbar-progress-bar">
+                    <div className="navbar-progress-inner" style={{ width: `${progress}%` }}></div>
+                </div>
+            )}
             <div className="navbar-brand">
                 <span className="brand-logo">💎</span>
                 <span className="brand-name">PPTX 翻譯與校正控制台</span>
@@ -27,9 +32,9 @@ export function Navbar({ currentStep, status, onOpenSettings, onOpenManage, step
             <div className="navbar-actions">
                 <TokenStats />
 
-                <div className="mini-status">
+                <div className={`mini-status ${status.includes("失敗") || status.includes("異常") || status.includes("中斷") ? "is-error" : ""}`}>
                     <span className="dot pulse-blue"></span>
-                    <span className="status-text">{status}</span>
+                    <span className="status-text" title={status}>{status}</span>
                 </div>
 
                 <div className="action-btns">

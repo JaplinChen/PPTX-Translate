@@ -11,6 +11,7 @@ import time
 from urllib.error import HTTPError
 
 from backend.services.language_detect import detect_language
+from backend.services.translation_cache import cache
 from backend.services.llm_clients import MockTranslator
 from backend.services.llm_contract import build_contract, coerce_contract, validate_contract
 from backend.services.llm_placeholders import apply_placeholders
@@ -114,16 +115,58 @@ def translate_chunk(
                 chunk_index, attempt, len(chunk_blocks),
             )
             
+            # --- Cache Layer ---
+            final_blocks = []
+            uncached_indices = []
+            
+            for i, block in enumerate(chunk_blocks):
+                cached = cache.get(
+                    block.get("source_text", ""), 
+                    target_language, 
+                    provider, 
+                    params.get("model", "default")
+                )
+                if cached:
+                    final_blocks.append({**block, "translated_text": cached})
+                else:
+                    final_blocks.append(None) # Placeholder
+                    uncached_indices.append(i)
+            
+            if not uncached_indices:
+                LOGGER.info("LLM chunk %s: All blocks hit cache", chunk_index)
+                return {"blocks": final_blocks}
+
+            # Only translate uncached blocks
+            blocks_to_translate = [chunk_blocks[i] for i in uncached_indices]
+            
             if provider == "ollama":
                 result = _translate_ollama(
-                    translator, chunk_blocks, target_language, context,
+                    translator, blocks_to_translate, target_language, context,
                     preferred_terms, placeholder_tokens, tone, vision_context,
                 )
             else:
                 result = _translate_standard(
-                    translator, chunk_blocks, target_language, context,
+                    translator, blocks_to_translate, target_language, context,
                     preferred_terms, placeholder_tokens, tone, vision_context,
                 )
+            
+            # Fill the gaps and update cache
+            res_blocks = result.get("blocks", [])
+            for i, res_block in enumerate(res_blocks):
+                original_idx = uncached_indices[i]
+                translated_text = res_block.get("translated_text", "")
+                final_blocks[original_idx] = res_block
+                
+                # Update Cache
+                cache.set(
+                    chunk_blocks[original_idx].get("source_text", ""),
+                    target_language,
+                    provider,
+                    params.get("model", "default"),
+                    translated_text
+                )
+            
+            result["blocks"] = final_blocks
             
             chunk_texts = [item.get("translated_text", "") for item in result["blocks"]]
             if not retried_for_language and has_language_mismatch(chunk_texts, target_language):

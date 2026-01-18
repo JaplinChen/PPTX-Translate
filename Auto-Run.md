@@ -6,13 +6,8 @@
 
 - docker compose up/down/restart/logs/ps/build
 - docker logs/ps/exec
+- docker-compose up/down/restart/logs/ps/build
 - docker-compose up -d --build
-- docker-compose up -d --force-recreate
-- docker-compose down
-- docker-compose down -v
-- docker-compose down --volumes
-- docker-compose down --remove-orphans
-- docker-compose down --remove-orphans --volumes
 
 **讀取類命令：**
 

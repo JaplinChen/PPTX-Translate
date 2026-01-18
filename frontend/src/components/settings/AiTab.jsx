@@ -55,22 +55,6 @@ function AiTab({
                 </div>
             </div>
 
-            <div className="settings-section">
-                <h4 className="section-title">數據預處理</h4>
-                <div className="flex items-center gap-4">
-                    <button
-                        className={`btn ${status.includes("術語") ? "success" : "primary"}`}
-                        type="button"
-                        onClick={onExtractGlossary}
-                        disabled={busy}
-                    >
-                        {status.includes("術語") ? "✓ 已提取關鍵術語" : "智慧提取核心術語庫"}
-                    </button>
-                    <span className="text-xs text-slate-400">
-                        預先分析簡報內容，鎖定專業名詞以確保翻譯前後一致。
-                    </span>
-                </div>
-            </div>
         </div>
     );
 }

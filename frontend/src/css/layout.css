@@ -121,8 +121,7 @@
     }
 
     .panel-left {
-        @apply border-none shadow-none bg-slate-200/30 p-2;
-        background-color: var(--bg-sidebar);
+        @apply border-r border-slate-200 shadow-none bg-slate-50/50 backdrop-blur-sm p-4;
         height: calc(100vh - 12rem);
     }
 
@@ -145,20 +144,51 @@
     }
 
     .sidebar-scrollable-content {
-        @apply flex-1 overflow-y-auto px-4 flex flex-col gap-2;
+        @apply flex-1 overflow-y-auto flex flex-col gap-4 mt-4;
     }
 
     /* Accordion Styles */
     .accordion-section {
-        @apply border-b border-slate-100 last:border-b-0 py-1;
+        @apply border border-transparent last:border-b-0 py-1 transition-all duration-300 rounded-xl mb-1 relative;
+        /* 移除 overflow-hidden 以免裁剪陰影與內容 */
+    }
+
+    /* 連貫導軌虛擬元素 */
+    .accordion-section::after {
+        content: "";
+        @apply absolute left-[26px] top-10 bottom-0 w-[1px] bg-slate-200 -z-10;
+        display: none;
+        /* 預設隱藏，僅在非最後一項顯示 */
+    }
+
+    .accordion-section:not(:last-child)::after {
+        display: block;
+    }
+
+    .accordion-section.is-open {
+        @apply bg-white shadow-lg shadow-slate-200/50 py-3 border-slate-100;
+        /* 活性導航軌 */
+        border-left: 3px solid theme('colors.blue.500');
+    }
+
+    .accordion-section.is-done:not(.is-open) {
+        @apply border-transparent;
     }
 
     .accordion-header {
-        @apply flex items-center justify-between w-full py-3 text-left font-bold text-slate-700 hover:text-blue-600 transition-colors cursor-pointer;
+        @apply flex items-center justify-between w-full px-4 py-2.5 text-left font-bold text-slate-500 hover:text-blue-600 transition-all cursor-pointer;
+    }
+
+    .is-open .accordion-header {
+        @apply text-slate-900 text-sm tracking-tight;
+    }
+
+    .is-done .accordion-header {
+        @apply text-blue-600/80;
     }
 
     .accordion-content {
-        @apply overflow-hidden transition-all duration-300 ease-in-out;
+        @apply overflow-hidden transition-all duration-300 ease-in-out px-4;
     }
 
     .accordion-indicator {
@@ -178,6 +208,40 @@
         @apply inline-block px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-xs font-medium;
     }
 
+    .mini-status {
+        @apply flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200;
+        @apply max-w-[200px] sm:max-w-[300px] lg:max-w-[450px] transition-all duration-300;
+    }
+
+    .mini-status.is-error {
+        @apply bg-rose-50 border-rose-200 text-rose-600;
+    }
+
+    .mini-status.is-error .dot {
+        @apply bg-rose-500 shadow-sm shadow-rose-500/50;
+        animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .status-text {
+        @apply text-xs font-medium truncate whitespace-nowrap overflow-hidden;
+    }
+
+    .block-meta {
+        @apply flex items-center gap-2 border-b border-slate-200 bg-slate-50/50 text-[11px] text-slate-500 font-medium;
+        /* 移除 px-3，改由外層 block-card 的 p-3 統一控制寬度 */
+        @apply p-0 pb-1.5 mb-2;
+    }
+
+    .btn-tool {
+        @apply flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-transparent;
+        @apply bg-transparent text-slate-500 transition-all duration-200 cursor-pointer;
+        @apply hover:bg-white hover:border-slate-300 hover:text-blue-600 hover:shadow-sm;
+    }
+
+    .btn-tool .icon {
+        @apply text-sm opacity-80;
+    }
+
     .status-pill {
         @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium;
     }
@@ -195,7 +259,7 @@
 
     /* Block Cards (Compact Header) */
     .block-card {
-        @apply bg-white border border-slate-300 rounded-xl p-3 flex flex-col gap-2 shadow-sm hover:shadow-md hover:border-blue-400/50 transition-all duration-200;
+        @apply bg-white border border-slate-300 rounded-lg p-3 flex flex-col gap-2 shadow-sm hover:shadow-md hover:border-blue-400/50 transition-all duration-200;
     }
 
     .block-card.is-muted {
@@ -203,7 +267,7 @@
     }
 
     .block-meta {
-        @apply flex items-center gap-2 text-xs text-slate-500 flex-wrap;
+        /* 此處原本有重複定義，已合併至上方 */
     }
 
     .block-actions {
@@ -394,5 +458,36 @@
 
     .model-tag {
         @apply px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full;
+    }
+
+    /* --- Progress Bar --- */
+    .navbar-progress-bar {
+        @apply absolute bottom-0 left-0 w-full h-[3px] bg-slate-100/50 overflow-hidden;
+    }
+
+    .navbar-progress-inner {
+        @apply h-full bg-blue-500 transition-all duration-500 ease-out;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+    }
+
+    /* --- Block Card Animations --- */
+    .block-card.is-translating {
+        @apply border-blue-400 bg-blue-50/20 shadow-lg shadow-blue-500/5;
+        animation: card-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes card-pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.9;
+            transform: scale(0.998);
+            border-color: #60a5fa;
+        }
     }
 }

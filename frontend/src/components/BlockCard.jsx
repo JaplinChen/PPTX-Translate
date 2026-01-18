@@ -51,7 +51,7 @@ export default function BlockCard({
     };
 
     return (
-        <div className={`block-card ${block.selected === false ? "is-muted" : ""}`}>
+        <div className={`block-card ${block.selected === false ? "is-muted" : ""} ${block.isTranslating ? "is-translating" : ""}`}>
             <div className="block-meta">
                 <span className="block-number">#{index + 1}</span>
                 <label className="select-box">
@@ -66,6 +66,15 @@ export default function BlockCard({
                 ) : block.updatedAt ? (
                     <span className="status-pill">更新 {block.updatedAt}</span>
                 ) : null}
+
+                <div className="block-meta-tools ml-auto flex gap-1">
+                    <button className="btn-tool" type="button" onClick={() => onAddGlossary(block)} title="加入術語庫">
+                        <span className="icon">📖</span> 術語
+                    </button>
+                    <button className="btn-tool" type="button" onClick={() => onAddMemory(block)} title="加入翻譯記憶">
+                        <span className="icon">🧠</span> 記憶
+                    </button>
+                </div>
             </div>
             <div className="block-body">
                 <div>
@@ -103,10 +112,6 @@ export default function BlockCard({
                         />
                     )}
                 </div>
-            </div>
-            <div className="block-actions">
-                <button className="action-btn" type="button" onClick={() => onAddGlossary(block)}>加入術語</button>
-                <button className="action-btn" type="button" onClick={() => onAddMemory(block)}>加入記憶</button>
             </div>
         </div>
     );

@@ -58,5 +58,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Local data (optional, depending on need)
-# data/
+# Local data
+backend/data/*.db
+data/
