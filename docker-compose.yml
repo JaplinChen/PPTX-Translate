@@ -17,18 +17,31 @@ services:
       - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:7b}
       - OLLAMA_TIMEOUT=${OLLAMA_TIMEOUT:-180}
       - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX:-8192}
+      # Gemini Configuration
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-1.5-flash}
+      - GEMINI_BASE_URL=${GEMINI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta}
       - GEMINI_TIMEOUT=${GEMINI_TIMEOUT:-180}
+      # OpenAI Configuration
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
       - OPENAI_TIMEOUT=${OPENAI_TIMEOUT:-60}
+      # SiliconFlow Configuration
+      - SILICONFLOW_API_KEY=${SILICONFLOW_API_KEY:-}
+      - SILICONFLOW_MODEL=${SILICONFLOW_MODEL:-Qwen/Qwen2.5-7B-Instruct}
+      - SILICONFLOW_BASE_URL=${SILICONFLOW_BASE_URL:-https://api.siliconflow.cn/v1}
+      # Translation Settings
       - SOURCE_LANGUAGE=${SOURCE_LANGUAGE:-auto}
       - LLM_CONTEXT_STRATEGY=${LLM_CONTEXT_STRATEGY:-none}
+      - LLM_GLOSSARY_PATH=${LLM_GLOSSARY_PATH:-}
       - LLM_FALLBACK_ON_ERROR=${LLM_FALLBACK_ON_ERROR:-0}
-      - LLM_SINGLE_REQUEST=${LLM_SINGLE_REQUEST:-0}
+      - LLM_SINGLE_REQUEST=${LLM_SINGLE_REQUEST:-1}
       - LLM_CHUNK_SIZE=${LLM_CHUNK_SIZE:-50}
       - LLM_MAX_RETRIES=${LLM_MAX_RETRIES:-3}
+      - LLM_RETRY_BACKOFF=${LLM_RETRY_BACKOFF:-0.8}
+      - LLM_RETRY_MAX_BACKOFF=${LLM_RETRY_MAX_BACKOFF:-8}
+      - LLM_CHUNK_DELAY=${LLM_CHUNK_DELAY:-0}
       - CORS_ORIGIN=${CORS_ORIGIN:-*}
     volumes:
       - ./data:/app/data

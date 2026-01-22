@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 const LANGUAGES = [
-    { code: "zh-TW", label: "繁體中文", flag: "🇹🇼" },
-    { code: "en-US", label: "English", flag: "🇺🇸" },
-    { code: "vi", label: "Tiếng Việt", flag: "🇻🇳" }
+    { code: "zh-TW", label: "繁體中文", flag: "tw" },
+    { code: "en-US", label: "English", flag: "us" },
+    { code: "vi", label: "Tiếng Việt", flag: "vn" }
 ];
 
 export default function LanguageSelector() {
@@ -32,12 +32,15 @@ export default function LanguageSelector() {
     return (
         <div className="relative" ref={dropdownRef}>
             <button
-                className="lang-btn"
+                className="lang-btn group"
                 onClick={() => setIsOpen(!isOpen)}
                 title={currentLang.label} // Tooltip showing language name
                 type="button"
             >
-                <span className="text-xl leading-none">{currentLang.flag}</span>
+                <img
+                    src={`https://flagcdn.com/w40/${currentLang.flag}.png`}
+                    alt={currentLang.label}
+                />
             </button>
 
             {isOpen && (
@@ -49,7 +52,11 @@ export default function LanguageSelector() {
                             onClick={() => handleSelect(lang.code)}
                             type="button"
                         >
-                            <span className="text-lg">{lang.flag}</span>
+                            <img
+                                src={`https://flagcdn.com/w40/${lang.flag}.png`}
+                                alt={lang.label}
+                                className="w-6 h-4 object-cover rounded-sm border border-slate-100 shadow-sm"
+                            />
                             <span className="text-sm font-medium">{lang.label}</span>
                         </button>
                     ))}

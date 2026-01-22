@@ -41,13 +41,13 @@ export function Sidebar({
                 <div className={`accordion-section ${openSections.step1 ? "is-open" : ""} ${isFileSelected ? "is-done" : ""}`}>
                     <div className="accordion-header" onClick={() => toggleSection("step1")}>
                         <div className="flex items-center gap-2">
-                            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${isFileSelected ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>{isFileSelected ? "✓" : "1"}</span>
+                            <span className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold ${isFileSelected ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>{isFileSelected ? "✓" : "1"}</span>
                             <span className="step-label">{t("nav.step1")}</span>
                         </div>
                         <span className="accordion-indicator">▼</span>
                     </div>
                     <div className="accordion-content" style={{ maxHeight: openSections.step1 ? "500px" : "0", opacity: openSections.step1 ? 1 : 0 }}>
-                        <div className="form-group pt-2"><div className="file-input-container">
+                        <div className="form-group py-1"><div className="file-input-container">
                             <label className={`file-input-label ${isFileSelected ? "is-selected" : ""}`}>
                                 <span className="icon">{isFileSelected ? "📄" : "📁"}</span>
                                 <div className="flex flex-col items-center">
@@ -72,7 +72,7 @@ export function Sidebar({
                 <div className={`accordion-section ${openSections.step3 ? "is-open" : ""} ${hasTranslation ? "is-done" : ""}`}>
                     <div className="accordion-header" onClick={() => toggleSection("step3")}>
                         <div className="flex items-center gap-2">
-                            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${hasTranslation ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>{hasTranslation ? "✓" : "3"}</span>
+                            <span className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold ${hasTranslation ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>{hasTranslation ? "✓" : "3"}</span>
                             <span className="step-label">{t("nav.step3")}</span>
                         </div>
                         <span className="accordion-indicator">▼</span>
@@ -99,7 +99,7 @@ export function Sidebar({
                 <div className={`accordion-section ${openSections.step4 ? "is-open" : ""} ${isFinished ? "is-done" : ""}`}>
                     <div className="accordion-header" onClick={() => toggleSection("step4")}>
                         <div className="flex items-center gap-2">
-                            <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${isFinished ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>{isFinished ? "✓" : "4"}</span>
+                            <span className={`flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold ${isFinished ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-500"}`}>{isFinished ? "✓" : "4"}</span>
                             <span className="step-label">{t("nav.step4")}</span>
                         </div>
                         <span className="accordion-indicator">▼</span>

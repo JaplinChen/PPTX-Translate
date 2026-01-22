@@ -36,13 +36,20 @@ else
     echo "    Note: Ollama features will not be available"
 fi
 
+# Check if .env file exists
+if [ ! -f .env ]; then
+    echo "[WARNING] .env file not found. Creating from .env.example..."
+    cp .env.example .env
+    echo "    Created .env. Please update it with your API keys if needed."
+fi
+
 # Build and start containers
 echo "[3/4] Building and starting Docker containers..."
 docker compose up -d --build
 
 # Wait for health check
 echo "[4/4] Waiting for services to be healthy..."
-sleep 10
+sleep 5
 
 # Check status
 echo
@@ -59,5 +66,8 @@ echo "  Backend:  http://localhost:5001"
 echo "  API Docs: http://localhost:5001/docs"
 echo "================================"
 echo
-echo "Use 'docker compose logs -f' to view logs"
+echo "Container Logs summary:"
+docker compose logs --tail=20
+echo
+echo "Use 'docker compose logs -f' to view full logs"
 echo "Use 'docker compose down' to stop all services"

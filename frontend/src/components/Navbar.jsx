@@ -42,14 +42,14 @@ export function Navbar({ currentStep, status, appStatus, onOpenSettings, onOpenM
             </div>
 
             <div className="action-btns">
-                <LanguageSelector />
                 <TokenStats />
+                <LanguageSelector />
 
-                <button className="nav-icon-btn" onClick={onOpenManage} title={t("nav.manage")}>
-                    📚
+                <button className="nav-icon-btn group" onClick={onOpenManage} title={t("nav.manage")}>
+                    <img src="https://emojicdn.elk.sh/📚?style=apple" alt="Manage" className="w-6 h-6 object-contain" />
                 </button>
-                <button className="nav-icon-btn" onClick={onOpenSettings} title={t("nav.settings")}>
-                    ⚙
+                <button className="nav-icon-btn group" onClick={onOpenSettings} title={t("nav.settings")}>
+                    <img src="https://emojicdn.elk.sh/⚙?style=apple" alt="Settings" className="w-6 h-6 object-contain" />
                 </button>
             </div>
         </nav >
