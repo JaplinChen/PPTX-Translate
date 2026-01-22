@@ -1,0 +1,118 @@
+source_lang,target_lang,source_text,target_text
+vi,zh-TW,Giải pháp,解決方案
+vi,zh-TW,Tự động,自動
+vi,zh-TW,Doanh nghiệp,企業
+vi,zh-TW,Hệ thống,系統
+vi,zh-TW,Phần mềm,軟體
+vi,zh-TW,Phần cứng,硬體
+vi,zh-TW,Dữ liệu,資料
+vi,zh-TW,Thông tin,資訊
+vi,zh-TW,Công nghệ,技術
+vi,zh-TW,Người dùng,使用者
+vi,zh-TW,Khách hàng,客戶
+vi,zh-TW,Sản phẩm,產品
+vi,zh-TW,Dịch vụ,服務
+vi,zh-TW,Quy trình,流程
+vi,zh-TW,Quản lý,管理
+vi,zh-TW,Kinh doanh,商業
+vi,zh-TW,Tài chính,財務
+vi,zh-TW,Marketing,行銷
+vi,zh-TW,Nhân sự,人力資源
+vi,zh-TW,Vận hành,營運
+vi,zh-TW,Hiệu suất,效能
+vi,zh-TW,Chất lượng,品質
+vi,zh-TW,An ninh,安全
+vi,zh-TW,Bảo mật,資安
+vi,zh-TW,Tích hợp,整合
+vi,zh-TW,Triển khai,部署
+vi,zh-TW,Tối ưu hóa,優化
+vi,zh-TW,Tự động hóa,自動化
+vi,zh-TW,Điện toán đám mây,雲端運算
+vi,zh-TW,Trí tuệ nhân tạo,人工智慧
+vi,zh-TW,Học máy,機器學習
+vi,zh-TW,Dữ liệu lớn,大數據
+vi,zh-TW,Phân tích,分析
+vi,zh-TW,Báo cáo,報告
+vi,zh-TW,Đánh giá,評估
+vi,zh-TW,Kiểm tra,檢測
+vi,zh-TW,Xác minh,驗證
+vi,zh-TW,Chứng nhận,認證
+vi,zh-TW,Giám sát,監控
+vi,zh-TW,Điều khiển,控制
+vi,zh-TW,Cảnh báo,警報
+vi,zh-TW,Sự cố,故障
+vi,zh-TW,Lỗi,錯誤
+vi,zh-TW,Hoạt động,運作
+vi,zh-TW,Hiện có,現有
+vi,zh-TW,Mới,新增
+vi,zh-TW,Cập nhật,更新
+vi,zh-TW,Nâng cấp,升級
+vi,zh-TW,Cài đặt,安裝
+vi,zh-TW,Gỡ bỏ,移除
+vi,zh-TW,Kích hoạt,啟用
+vi,zh-TW,Vô hiệu hóa,停用
+vi,zh-TW,Bật,開啟
+vi,zh-TW,Tắt,關閉
+vi,zh-TW,Hỗ trợ,支援
+vi,zh-TW,Yêu cầu,要求
+vi,zh-TW,Phản hồi,回饋
+vi,zh-TW,Xử lý,處理
+vi,zh-TW,Lưu trữ,儲存
+vi,zh-TW,Tải lên,上傳
+vi,zh-TW,Tải xuống,下載
+vi,zh-TW,Đồng bộ,同步
+vi,zh-TW,Chia sẻ,共享
+vi,zh-TW,Truy cập,存取
+vi,zh-TW,Quyền,權限
+vi,zh-TW,Đăng nhập,登入
+vi,zh-TW,Đăng xuất,登出
+vi,zh-TW,Tài khoản,帳號
+vi,zh-TW,Mật khẩu,密碼
+vi,zh-TW,Xác thực,驗證
+vi,zh-TW,Phiên,工作階段
+vi,zh-TW,Cấu hình,組態
+vi,zh-TW,Thiết lập,設定
+vi,zh-TW,Tùy chỉnh,自訂
+vi,zh-TW,Mặc định,預設
+vi,zh-TW,Tùy chọn,選項
+vi,zh-TW,Chế độ,模式
+vi,zh-TW,Trạng thái,狀態
+vi,zh-TW,Hoàn tất,完成
+vi,zh-TW,Đang chờ,待處理
+vi,zh-TW,Thất bại,失敗
+vi,zh-TW,Thành công,成功
+vi,zh-TW,Tiến độ,進度
+vi,zh-TW,Tổng,總計
+vi,zh-TW,Phần trăm,百分比
+vi,zh-TW,Số lượng,數量
+vi,zh-TW,Tối đa,最大
+vi,zh-TW,Tối thiểu,最小
+vi,zh-TW,Trung bình,平均
+vi,zh-TW,Giới hạn,限制
+vi,zh-TW,Điều kiện,條件
+vi,zh-TW,Quy tắc,規則
+vi,zh-TW,Chính sách,政策
+vi,zh-TW,Hướng dẫn,指南
+vi,zh-TW,Tài liệu,文件
+vi,zh-TW,Hợp đồng,合約
+vi,zh-TW,Thỏa thuận,協議
+vi,zh-TW,Báo giá,報價
+vi,zh-TW,Hóa đơn,發票
+vi,zh-TW,Thanh toán,付款
+vi,zh-TW,Giao hàng,交貨
+vi,zh-TW,Đơn hàng,訂單
+vi,zh-TW,Kho,庫存
+vi,zh-TW,Vận chuyển,運輸
+vi,zh-TW,Bưu chính,郵政
+vi,zh-TW,Bảo hiểm,保險
+vi,zh-TW,Thuế,稅金
+vi,zh-TW,Phí,費用
+vi,zh-TW,Giá,價格
+vi,zh-TW,Chi phí,成本
+vi,zh-TW,Lợi nhuận,利潤
+vi,zh-TW,Doanh thu,營收
+vi,zh-TW,Ngân sách,預算
+vi,zh-TW,Đầu tư,投資
+vi,zh-TW,Tài chính,財務
+vi,zh-TW,Kế toán,會計
+vi,zh-TW,Kiểm toán,審計
