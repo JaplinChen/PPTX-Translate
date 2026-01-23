@@ -20,7 +20,8 @@ class TestPptxApplyBilingual(unittest.TestCase):
             pptx_out = f"{temp_dir}/sample_bilingual.pptx"
             presentation.save(pptx_in)
 
-            blocks = extract_blocks(pptx_in)
+            result = extract_blocks(pptx_in)
+            blocks = result["blocks"]
             for block in blocks:
                 block["translated_text"] = f"TR:{block['source_text']}"
 

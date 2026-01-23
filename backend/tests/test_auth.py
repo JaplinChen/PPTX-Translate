@@ -1,6 +1,6 @@
 import pytest
 from fastapi import Request, HTTPException
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock
 from backend.tools.auth_helper import AuthManager, UserInfo, MockAuthProvider
 
 @pytest.mark.asyncio
@@ -13,7 +13,7 @@ async def test_mock_auth_provider():
 
 @pytest.mark.asyncio
 async def test_auth_manager_success():
-    mock_provider = MagicMock()
+    mock_provider = AsyncMock()
     mock_provider.authenticate.return_value = UserInfo(uid="u1", username="testuser")
     
     manager = AuthManager(mock_provider)
@@ -23,7 +23,7 @@ async def test_auth_manager_success():
 
 @pytest.mark.asyncio
 async def test_auth_manager_unauthorized():
-    mock_provider = MagicMock()
+    mock_provider = AsyncMock()
     mock_provider.authenticate.return_value = None
     
     manager = AuthManager(mock_provider)

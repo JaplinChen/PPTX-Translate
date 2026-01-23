@@ -22,7 +22,8 @@ class TestPptxExtract(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             pptx_path = f"{temp_dir}/sample.pptx"
             presentation.save(pptx_path)
-            blocks = extract_blocks(pptx_path)
+            result = extract_blocks(pptx_path)
+            blocks = result["blocks"]
 
         self.assertTrue(any(block["block_type"] == "textbox" for block in blocks))
         self.assertTrue(any(block["block_type"] == "table_cell" for block in blocks))
